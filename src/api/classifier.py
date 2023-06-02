@@ -1,12 +1,12 @@
 from langchain.agents import Tool, AgentExecutor, LLMSingleActionAgent, AgentOutputParser
 from langchain.prompts import StringPromptTemplate
-from langchain import OpenAI, SerpAPIWrapper, LLMChain
+from langchain import OpenAI, LLMChain
 from typing import List, Union
 from langchain.schema import AgentAction, AgentFinish
 from langchain.memory import ConversationBufferWindowMemory
 import re
 
-class CustomAgent:
+class Classifier:
     def __init__(self, tools):
         self.tools = tools
         self.template_with_history = """Answer the following questions as best you can, but speaking as a pirate might speak. You have access to the following tools:
@@ -32,10 +32,10 @@ class CustomAgent:
             New question: {input}
             {agent_scratchpad}"""
         
-        self.prompt = self.CustomPromptTemplate(
+        self.prompt_with_history = self.CustomPromptTemplate(
             template=self.template_with_history,
             tools=self.tools,
-            input_variables=["input", "intermediate_steps"]
+            input_variables=["input", "intermediate_steps", "history"]
         )
         self.output_parser = self.CustomOutputParser()
 
@@ -57,6 +57,11 @@ class CustomAgent:
         self.agent_executor = AgentExecutor.from_agent_and_tools(agent=self.agent, tools=self.tools, verbose=True, memory=self.memory)
 
     class CustomPromptTemplate(StringPromptTemplate):
+        # The template to use
+        template: str
+        # The list of tools available
+        tools: List[Tool]
+            
         def format(self, **kwargs) -> str:
             intermediate_steps = kwargs.pop("intermediate_steps")
             thoughts = ""
@@ -90,6 +95,3 @@ class CustomAgent:
     def intake(self, input_str):
        return self.agent_executor.run(input_str)
 
-# Usage:
-custom_agent = CustomAgent(tools=[])
-custom_agent.run("How many people live in canada as of 2023?")
