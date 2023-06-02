@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from src.api.classifier_services import ClassifierManager
+from gekko.api.classifier_services import ClassifierManager
 
 app = Flask(__name__)
 
