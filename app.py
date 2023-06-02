@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from gekko.api.classifier_services import ClassifierManager
 from gekko.whisper.live_transcribe import main
+from gekko.memory.memory_writer import add_to_todo_stack
 app = Flask(__name__)
 
 classifier_manager = ClassifierManager()
@@ -31,12 +32,20 @@ def get_new_classifier():
 def start_transcriber():
     model = "tiny"
     non_english = False
-    energy_threshold = 1000
+    energy_threshold = 700
     record_timeout = 2
-    phrase_timeout =3
+    phrase_timeout = 5
 
     main(model, non_english, energy_threshold, record_timeout, phrase_timeout)
     return jsonify({"message": "Started Transcriber"})
+
+@app.route('/memory/write', methods=['POST'])
+def write_to_todo_stack():
+    try: 
+        add_to_todo_stack("TEST TEXT")
+        return jsonify({"message": "Wrote to file"})
+    except Exception as e: 
+        return jsonify({"Error:": e})
 
 if __name__ == '__main__':
     app.run(debug=True)

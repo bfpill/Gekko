@@ -12,7 +12,7 @@ from queue import Queue
 from tempfile import NamedTemporaryFile
 from time import sleep
 from sys import platform
-from gekko.memory.memory_writer import write_to_json, add_to_todo_stack
+from gekko.memory.memory_writer import add_to_todo_stack
 
 def main(model, energy_threshold, non_english, record_timeout, phrase_timeout, default_microphone="pulse"):
     '''
@@ -63,7 +63,7 @@ def main(model, energy_threshold, non_english, record_timeout, phrase_timeout, d
     # Load / Download model
     if model != "large" and not non_english:
         model = model + ".en"
-    audio_model = whisper.load_model(model)
+    audio_model = whisper.load_model("small.en")
 
     temp_file = NamedTemporaryFile().name
     
@@ -122,15 +122,11 @@ def main(model, energy_threshold, non_english, record_timeout, phrase_timeout, d
                 # Otherwise edit the existing one.
                 if phrase_complete:
                     transcription.append(text)
+                    add_to_todo_stack(text)
+                    print(text)
                 else:
                     transcription[-1] = text
-
-                # Clear the console to reprint the updated transcription.
-                os.system('cls' if os.name=='nt' else 'clear')
-                for line in transcription:
-                    print(line)
-                    add_to_todo_stack(line)
-
+                
                 # Flush stdout.
                 print('', end='', flush=True)
 
