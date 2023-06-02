@@ -12,27 +12,25 @@ from queue import Queue
 from tempfile import NamedTemporaryFile
 from time import sleep
 from sys import platform
+from gekko.memory.memory_writer import write_to_json, add_to_todo_stack
 
+def main(model, energy_threshold, non_english, record_timeout, phrase_timeout, default_microphone="pulse"):
+    '''
+    "--model", default="base", help="Model to use", choices=["tiny", "base", "small", "medium", "large"]
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--model", default="tiny", help="Model to use",
-                        choices=["tiny", "base", "small", "medium", "large"])
-    parser.add_argument("--non_english", action='store_true',
-                        help="Don't use the english model.")
-    parser.add_argument("--energy_threshold", default=1000,
-                        help="Energy level for mic to detect.", type=int)
-    parser.add_argument("--record_timeout", default=2,
-                        help="How real time the recording is in seconds.", type=float)
-    parser.add_argument("--phrase_timeout", default=3,
-                        help="How much empty space between recordings before we "
-                             "consider it a new line in the transcription.", type=float)  
+    "--non_english", action='store_true',help="Don't use the english model."
+
+    "--energy_threshold", default=1000, help="Energy level for mic to detect.", type=int
+
+    "--record_timeout", default=2, help="How real time the recording is in seconds.", type=float
+
+    "--phrase_timeout", default=3, help="How much empty space between recordings before we consider it a new line in the transcription.", type=float
     if 'linux' in platform:
-        parser.add_argument("--default_microphone", default='pulse',
-                            help="Default microphone name for SpeechRecognition. "
-                                 "Run this with 'list' to view available Microphones.", type=str)
-    args = parser.parse_args()
+        "--default_microphone", default='pulse', help="Default microphone name for SpeechRecognition. 
+        Run this with 'list' to view available Microphones.", type=str
     
+    '''
+   
     # The last time a recording was retreived from the queue.
     phrase_time = None
     # Current raw audio bytes.
@@ -41,14 +39,14 @@ def main():
     data_queue = Queue()
     # We use SpeechRecognizer to record our audio because it has a nice feauture where it can detect when speech ends.
     recorder = sr.Recognizer()
-    recorder.energy_threshold = args.energy_threshold
+    recorder.energy_threshold = energy_threshold
     # Definitely do this, dynamic energy compensation lowers the energy threshold dramtically to a point where the SpeechRecognizer never stops recording.
     recorder.dynamic_energy_threshold = False
     
     # Important for linux users. 
     # Prevents permanent application hang and crash by using the wrong Microphone
     if 'linux' in platform:
-        mic_name = args.default_microphone
+        mic_name = default_microphone
         if not mic_name or mic_name == 'list':
             print("Available microphone devices are: ")
             for index, name in enumerate(sr.Microphone.list_microphone_names()):
@@ -63,16 +61,11 @@ def main():
         source = sr.Microphone(sample_rate=16000)
         
     # Load / Download model
-    model = args.model
-    if args.model != "large" and not args.non_english:
+    if model != "large" and not non_english:
         model = model + ".en"
     audio_model = whisper.load_model(model)
 
-    record_timeout = args.record_timeout
-    phrase_timeout = args.phrase_timeout
-
     temp_file = NamedTemporaryFile().name
-    transcription = ['']
     
     with source:
         recorder.adjust_for_ambient_noise(source)
@@ -95,6 +88,7 @@ def main():
 
     while True:
         try:
+            transcription = [""]
             now = datetime.utcnow()
             # Pull raw recorded audio from the queue.
             if not data_queue.empty():
@@ -135,6 +129,8 @@ def main():
                 os.system('cls' if os.name=='nt' else 'clear')
                 for line in transcription:
                     print(line)
+                    add_to_todo_stack(line)
+
                 # Flush stdout.
                 print('', end='', flush=True)
 

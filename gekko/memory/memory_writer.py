@@ -18,6 +18,9 @@ def write_to_json(input_string):
     with open(filename, 'w') as f:
         json.dump(data, f)
 
+def add_to_todo_stack(text):
+    with open("./todo_stack", 'w') as file:
+        file.write(text + "\n")
 
 def read_by_date(filename, date):
     # Convert the date to ISO 8601 format (without time)
