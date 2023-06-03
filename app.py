@@ -14,25 +14,30 @@ def intake():
             response = classifier_manager.create_classifier()         
         except Exception as e: 
             return jsonify({e: response[0]}), 500
-        
-    response = classifier_manager.intake("How much money should milk cost? Answer concisely")
     
-    return jsonify({"response": response})
+    return jsonify({"response": "yeah classifier created"})
         
-
 @app.route('/classifier/create', methods=['POST'])
 def get_new_classifier():
     response = classifier_manager.create_classifier()
-    if "Error" in response[0]:
-        return jsonify({"error": response[0]}), 500
+    if response is Exception:
+        return jsonify({"error": "Error"}), 500
     else:
-        return jsonify({"message": response[0]})
+        return jsonify({"message": "Worked!!"})
     
+@app.route('/classifier/start', methods=['POST'])
+def start_classifier():
+    try:
+        classifier_manager.start_classifier()
+        return jsonify({"message": "Worked!!"})
+    except Exception as e:
+        return jsonify({"error": "Error"}), 500
+
 @app.route('/whisper/start', methods=['POST'])
 def start_transcriber():
     model = "tiny"
     non_english = False
-    energy_threshold = 700
+    energy_threshold = 1000
     record_timeout = 2
     phrase_timeout = 5
 
@@ -48,4 +53,4 @@ def write_to_todo_stack():
         return jsonify({"Error:": e})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=8000, debug=True)
