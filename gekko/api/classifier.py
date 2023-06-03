@@ -87,10 +87,6 @@ class Classifier:
             action = match.group(1).strip()
             action_input = match.group(2)
             return AgentAction(tool=action, tool_input=action_input.strip(" ").strip('"'), log=llm_output)
-    
-    # @TODO implement
-    def restart():
-        return 1
 
     def intake(self, input_str):
        return self.agent_executor.run(input_str)
