@@ -7,24 +7,35 @@ from langchain.memory import ConversationBufferWindowMemory
 import re
 
 class Classifier:
-    def __init__(self, tools):
-        self.tools = tools
-        self.template_with_history = """Answer the following questions as best you can, but speaking as a pirate might speak. You have access to the following tools:
+    def __init__(self):
+        def print_title_and_summary(input):
+            title, summary = parse_string(input)
+            print(title + " " + summary)
 
+        def parse_string(s):
+            parts = s.split('" : "')
+            title = parts[0].split('"')[1]
+            summary = parts[1].split('"')[0]
+            return title, summary
+        
+        self.tools = [
+            Tool.from_function(
+            func=print_title_and_summary,
+            name = "Search",
+            description="""Use this to sumbit your title and summary. Format your input as such: title: "title" : title "summary" : summary"""
+            ),
+        ]
+
+        self.template_with_history = """You are an AI whose job it is to decide if a conversation is important or not. 
+
+            If you think the conversation is important, give it a title and summarize it. Sumbit the title and summary via the tool provided.
+
+            Otherwise, respond with "Not Important"
+
+
+            Here is the provided tool:
+            
             {tools}
-
-            Use the following format:
-
-            Question: the input question you must answer
-            Thought: you should always think about what to do
-            Action: the action to take, should be one of [{tool_names}]
-            Action Input: the input to the action
-            Observation: the result of the action
-            ... (this Thought/Action/Action Input/Observation can repeat N times)
-            Thought: I now know the final answer
-            Final Answer: the final answer to the original input question
-
-            Begin! Remember to speak as a pirate when giving your final answer. Use lots of "Arg"s
 
             Previous conversation history:
             {history}

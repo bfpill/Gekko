@@ -22,9 +22,9 @@ def intake():
 def get_new_classifier():
     response = classifier_manager.create_classifier()
     if response is Exception:
-        return jsonify({"error": "Error"}), 500
+        return jsonify({"error": str(response)}), 500
     else:
-        return jsonify({"message": "Worked!!"})
+        return jsonify({"message": "it worked"})
     
 @app.route('/classifier/start', methods=['POST'])
 def start_classifier():
@@ -33,7 +33,7 @@ def start_classifier():
         classifier_manager.start_classifier()
         return jsonify({"message": "Worked!!"})
     except Exception as e:
-        return jsonify({"error": "Error"}), 500
+        return jsonify({"error": "Error" + str(e)}), 500
     
 @app.route('/gekko/start', methods=['POST'])
 def start_gekko():

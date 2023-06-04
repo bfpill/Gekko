@@ -1,9 +1,27 @@
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import os
-from classifier.classifier import Classifier
+
 class FileWatcher:
+
+    def __init__(self, classifier):
+        self.callback = classifier.intake
+
+    def watch_file(self):
+        dir_path = '/Volumes/T7/Gekko/gekko/memory/'
+        file_path = '/Volumes/T7/Gekko/gekko/memory/todo_stack.txt'
+        event_handler = self.MyHandler(file_path, self.callback)
+        observer = Observer()
+        observer.schedule(event_handler, path=dir_path)
+        observer.start()
+
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            observer.stop()
+        observer.join()
+
     class MyHandler(FileSystemEventHandler):
         def __init__(self, filename, callback):
             self.filename = filename
@@ -27,22 +45,3 @@ class FileWatcher:
                     file.write('')
             #self.process_events = False
             #self.process_events = True     -> use these when you inevitably need to change how this works. 
-
-    def __init__(self, classifier):
-        self.callback = classifier.intake
-
-    def watch_file(self):
-        dir_path = '/Volumes/T7/Gekko/gekko/memory/'
-        file_path = '/Volumes/T7/Gekko/gekko/memory/todo_stack.txt'
-
-        event_handler = self.MyHandler(file_path, self.callback)
-        observer = Observer()
-        observer.schedule(event_handler, path=dir_path)
-        observer.start()
-
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            observer.stop()
-        observer.join()

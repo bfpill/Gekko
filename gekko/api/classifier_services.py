@@ -19,7 +19,7 @@ class ClassifierManager:
     def create_classifier(self):
         # Initialize the CustomAgent with any necessary tools
         try:   
-            classifier = Classifier(self.tools)
+            classifier = Classifier()
             self.has_classifier = True
             return classifier
         
