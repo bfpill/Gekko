@@ -1,10 +1,17 @@
 import { Client } from "@notionhq/client"
 
-const notion = new Client({ auth: process.env.NOTION_KEY })
+import * as dotenv from 'dotenv';
 
+// Get environment variables
+dotenv.config() 
 
+const notion = new Client({ auth: process.env.NOTION_TOKEN })
 
 const databaseId = process.env.NOTION_DATABASE_ID
+
+console.log(process.env.NOTION_TOKEN)
+
+console.log(process.env.NOTION_DATABASE_ID)
 
 async function addItem(text) {
   try {
