@@ -9,12 +9,13 @@ from api.send_to_notion import write_to_notion
 import re
 from simple_chalk import chalk, red, green
 class Classifier:
+    
     def __init__(self):
         def print_title_and_summary(input):
             if input != "Not Important":
                 print(chalk.red("\n" + input))
                 title, summary = parse_string(input)
-                write_to_notion(title, summary, "FILLER TEXT")
+                write_to_notion(title, summary, self.text)
 
         def parse_string(s):
             parts = s.split(', ')
@@ -22,6 +23,8 @@ class Classifier:
             summary = parts[1]
             return title, summary
         
+        self.text = ""
+
         self.tools = [
             Tool.from_function(
             func=print_title_and_summary,
@@ -34,7 +37,11 @@ class Classifier:
 
         self.template_with_history = """You are an AI whose job it is to decide if a conversation is important or not. 
 
-            If you think the conversation is important, give it a title and summarize it. Submit the title and summary via the tool provided.
+            If you think the conversation is important, give it a title and summarise it. The title should be a couple words. The summary should be a short sentence. 
+
+            If there are any people names in the conversation, use the name of the person in the title.
+            
+            Submit the title and summary via the tool provided.
 
             Otherwise, respond with "Not Important"
 
@@ -42,7 +49,7 @@ class Classifier:
 
             Thought: The importance of the conversation on a scale of 0-10
             Action: {tool_names}
-            Action Input: The formatted title and summary
+            Action Input:
             Observation: the result of the action
             Thought: I now know the final answer
             Final Answer: Sumbitted or not important
@@ -112,5 +119,6 @@ class Classifier:
             return AgentAction(tool=action, tool_input=action_input.strip(" ").strip('"'), log=llm_output)
 
     def intake(self, input_str):
+       self.text = input_str
        return self.agent_executor.run(input_str)
 
