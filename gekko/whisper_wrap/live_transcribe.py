@@ -7,13 +7,15 @@ import speech_recognition as sr
 import whisper
 import torch
 
+from simple_chalk import chalk, green
+
 from datetime import datetime, timedelta
 from queue import Queue
 from tempfile import NamedTemporaryFile
 from time import sleep
 from sys import platform
 from memory.memory_writer import add_to_todo_stack
-from .send_to_notion import write_to_notion
+from api.send_to_notion import write_to_notion
 
 def main(model, energy_threshold, non_english, record_timeout, phrase_timeout, default_microphone="pulse"):
     '''
@@ -123,8 +125,8 @@ def main(model, energy_threshold, non_english, record_timeout, phrase_timeout, d
                 # Otherwise edit the existing one.
                 if phrase_complete:
                     transcription.append(text)
-                    write_to_notion(text)
-                    print(text)
+                    add_to_todo_stack(text)
+                    print(chalk.green(text))
                 else:
                     transcription[-1] = text
                 

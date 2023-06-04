@@ -29,8 +29,20 @@ def get_new_classifier():
 @app.route('/classifier/start', methods=['POST'])
 def start_classifier():
     try:
+        print("Transcriber started")
         classifier_manager.start_classifier()
         return jsonify({"message": "Worked!!"})
+    except Exception as e:
+        return jsonify({"error": "Error"}), 500
+    
+@app.route('/gekko/start', methods=['POST'])
+def start_gekko():
+    try:
+        classifier_manager.create_classifier()
+        print("classifier started")
+        start_transcriber()
+        print("Transcriber started")
+        return jsonify({"message": "Gekko Started!!"})
     except Exception as e:
         return jsonify({"error": "Error"}), 500
 
