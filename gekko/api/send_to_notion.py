@@ -1,11 +1,12 @@
 import requests
 
-def write_to_notion(title, summary, text):
+def write_to_notion(title, summary, text, score):
     try:
         payload = {
             "title": title, 
             "summary": summary,
-            "text": text
+            "text": text,
+            "score": score
         }
         response = requests.post("http://localhost:4000/notion_manager/", json=payload)
         response.raise_for_status()  # Raise an exception for non-2xx status codes

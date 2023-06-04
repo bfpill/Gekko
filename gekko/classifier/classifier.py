@@ -11,25 +11,51 @@ from simple_chalk import chalk, red, green
 class Classifier:
     
     def __init__(self):
+
+        self.score = self.title = self.text = self.summary = ""
+
         def print_title_and_summary(input):
             if input != "Not Important":
                 print(chalk.red("\n" + input))
-                title, summary = parse_string(input)
-                write_to_notion(title, summary, self.text)
+                self.title, self.summary = parse_string(input)
+                if all_fields_ready():
+                    write_to_notion(self.title, self.summary, self.text, self.score)
+                    return("I have successfully completed all my tasks. Go me!")
+                else:
+                    return("I have to sumbit the importance score now.")
 
         def parse_string(s):
             parts = s.split(', ')
             title = parts[0]
             summary = parts[1]
-            return title, summary
+            return (title, summary)
         
-        self.text = ""
+        def all_fields_ready():
+            if self.title != "" and self.text != "" and self.summary != "" and self.score != "":
+                return True
+        
+        def submit_importance_score(score):
+            print(chalk.red("\n" + score))
+            try:
+                self.score = int(score)
+            except: 
+                return("I accidentally sumbitted the score in an invalid format!!!")
+            if all_fields_ready():
+                write_to_notion(self.title, self.summary, self.text, self.score)
+                return("I have successfully completed all my tasks. Go me!")
+            else:
+                return("I have to sumbit the summary and title now.")
 
         self.tools = [
             Tool.from_function(
-            func=print_title_and_summary,
-            name = "Submit",
-            description="""Use this to sumbit your title and summary. Format your input as such: title, summary """
+            func = print_title_and_summary,
+            name = "Submit_Summary_and_Title",
+            description ="""Use this to sumbit your title and summary. Format your input as such: title, summary """
+            ),
+            Tool.from_function(
+            func = submit_importance_score,
+            name = "Submit_Importance_Score",
+            description="""Use this to sumbit the importance of the conversation. Input should be a number between 1 and 10."""
             ),
         ]
 
@@ -37,13 +63,13 @@ class Classifier:
 
         self.template_with_history = """You are an AI whose job it is to decide if a conversation is important or not. 
 
-            If you think the conversation is important, give it a title and summarise it. The title should be a couple words. The summary should be a short sentence. 
+            If you think the conversation is important, use the Submit_Importance_Score to sumbit how important it is on a scale of 0-10. 
+
+            Then, use the Submit_Summary_and_Title tool to sumbit a title and a summary for the conversation.
+            
+            The title should be a couple words. The summary should be a short sentence. 
 
             If there are any people names in the conversation, use the name of the person in the title.
-            
-            Submit the title and summary via the tool provided.
-
-            Otherwise, respond with "Not Important"
 
             Here is the format for your answer: 
 
@@ -51,6 +77,7 @@ class Classifier:
             Action: {tool_names}
             Action Input:
             Observation: the result of the action
+            ... (this Thought/Action/Action Input/Observation can repeat N times)
             Thought: I now know the final answer
             Final Answer: Sumbitted or not important
 

@@ -16,8 +16,8 @@ const addItem = async (req, res) => {
             });
         return;
     }
-    const { title, summary, text } = body;
-    const messageResponse =  await notionServices.addItem(title, summary, text);
+    const { title, summary, text, score } = body;
+    const messageResponse =  await notionServices.addItem(title, summary, text, score);
 
     res.status(201).send({ status: "OK", data: {messageResponse} });
 };
