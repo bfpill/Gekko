@@ -9,25 +9,45 @@ const notion = new Client({ auth: process.env.NOTION_TOKEN })
 
 const databaseId = process.env.NOTION_DATABASE_ID
 
-console.log(process.env.NOTION_TOKEN)
-
-console.log(process.env.NOTION_DATABASE_ID)
-
-async function addItem(text) {
+async function addItem(title, summary, text ) {
   try {
     const response = await notion.pages.create({
       parent: { database_id: databaseId as string },
+      icon: {emoji: "🦎"},
       properties: {
+        "Summary": {
+          "rich_text":[
+            {
+              "text": {
+                "content": summary
+              }
+            }
+          ]
+        },
         title: {
           title:[
             {
               "text": {
-                "content": text
+                "content": title
               }
             }
           ]
         }
       },
+      "children": [
+        {
+            "object": "block",
+            "paragraph": {
+                "rich_text": [
+                    {
+                        "text": {
+                            "content": text
+                        }
+                    }
+                ]
+            }
+        },
+    ]
     })
    return response
   } catch (error) {
