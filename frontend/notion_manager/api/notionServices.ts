@@ -4,10 +4,10 @@ const notion = new Client({ auth: process.env.NOTION_KEY })
 
 const databaseId = process.env.NOTION_DATABASE_ID
 
-async function addItem(text: string) {
+async function addItem(text) {
   try {
     const response = await notion.pages.create({
-      parent: { database_id: databaseId as string},
+      parent: { database_id: databaseId as string },
       properties: {
         title: {
           title:[
@@ -20,13 +20,10 @@ async function addItem(text: string) {
         }
       },
     })
-    console.log(response)
-    console.log("Success! Entry added.")
+   return response
   } catch (error) {
-    console.error(error.body)
+    return error
   }
 }
-
-addItem("Yurts in Big Sur, California")
 
 export default { addItem }

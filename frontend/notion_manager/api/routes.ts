@@ -1,10 +1,10 @@
 import express from 'express';
 
-import notionServices from './notionServices';
+import notionController from "./notionController"
 
 const router = express.Router();
 
-router.post("/", notionServices.addItem("I LOVE GEKKO"));
+router.post("/", notionController.addItem);
 
 // Export router
 export default router;
