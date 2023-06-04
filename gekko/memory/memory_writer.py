@@ -49,5 +49,3 @@ def read_by_date(filename, date):
     matching_objects = [obj for obj in data if obj['timestamp'].startswith(date_str)]
 
     return matching_objects
-
-
