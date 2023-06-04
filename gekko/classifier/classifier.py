@@ -4,34 +4,48 @@ from langchain import OpenAI, LLMChain
 from typing import List, Union
 from langchain.schema import AgentAction, AgentFinish
 from langchain.memory import ConversationBufferWindowMemory
-import re
+from api.send_to_notion import write_to_notion
 
+import re
+from simple_chalk import chalk, red, green
 class Classifier:
     def __init__(self):
         def print_title_and_summary(input):
-            title, summary = parse_string(input)
-            print(title + " " + summary)
+            if input != "Not Important":
+                print(chalk.red("\n" + input))
+                title, summary = parse_string(input)
+                write_to_notion(title, summary, "FILLER TEXT")
 
         def parse_string(s):
-            parts = s.split('" : "')
-            title = parts[0].split('"')[1]
-            summary = parts[1].split('"')[0]
+            parts = s.split(', ')
+            title = parts[0]
+            summary = parts[1]
             return title, summary
         
         self.tools = [
             Tool.from_function(
             func=print_title_and_summary,
-            name = "Search",
-            description="""Use this to sumbit your title and summary. Format your input as such: title: "title" : title "summary" : summary"""
+            name = "Submit",
+            description="""Use this to sumbit your title and summary. Format your input as such: title, summary """
             ),
         ]
 
+        self.tool_names = [tool.name for tool in self.tools]
+
         self.template_with_history = """You are an AI whose job it is to decide if a conversation is important or not. 
 
-            If you think the conversation is important, give it a title and summarize it. Sumbit the title and summary via the tool provided.
+            If you think the conversation is important, give it a title and summarize it. Submit the title and summary via the tool provided.
 
             Otherwise, respond with "Not Important"
 
+            Here is the format for your answer: 
+
+            Thought: The importance of the conversation on a scale of 0-10
+            Action: {tool_names}
+            Action Input: The formatted title and summary
+            Observation: the result of the action
+            Thought: I now know the final answer
+            Final Answer: Sumbitted or not important
 
             Here is the provided tool:
             
@@ -53,8 +67,6 @@ class Classifier:
         self.llm = OpenAI(temperature=0)
 
         self.llm_chain = LLMChain(llm=self.llm, prompt=self.prompt_with_history)
-
-        self.tool_names = [tool.name for tool in self.tools]
 
         self.agent = LLMSingleActionAgent(
             llm_chain=self.llm_chain, 
