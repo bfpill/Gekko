@@ -14,17 +14,19 @@ class FileWatcher:
             if event.src_path.endswith(self.filename) and self.process_events:
                 with open(event.src_path, 'r+') as file:
                     content = file.read()
-                    if content.strip():
-                        print("calling AI with: " + content)
-                        self.callback(content)  # call the passed in function with the content
-
-            self.process_events = False
-            # overwrite the file with the remaining content
-            with open(event.src_path, 'w') as file:
-                file.write('')
             
-            self.process_events = True
+            if content.strip() and content.strip() != "Thank you." and content.strip() != "Thanks for watching.":
+                with open(event.src_path, 'w') as file:
+                    file.write('')
 
+                print("calling AI with: " + content)
+                self.callback(content)  # call the passed in function with the content
+
+            else: 
+                with open(event.src_path, 'w') as file:
+                    file.write('')
+            #self.process_events = False
+            #self.process_events = True     -> use these when you inevitably need to change how this works. 
 
     def __init__(self, classifier):
         self.callback = classifier.intake
