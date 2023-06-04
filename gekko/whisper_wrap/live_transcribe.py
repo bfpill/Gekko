@@ -12,7 +12,8 @@ from queue import Queue
 from tempfile import NamedTemporaryFile
 from time import sleep
 from sys import platform
-from gekko.memory.memory_writer import add_to_todo_stack
+from memory.memory_writer import add_to_todo_stack
+from .send_to_notion import write_to_notion
 
 def main(model, energy_threshold, non_english, record_timeout, phrase_timeout, default_microphone="pulse"):
     '''
@@ -122,7 +123,7 @@ def main(model, energy_threshold, non_english, record_timeout, phrase_timeout, d
                 # Otherwise edit the existing one.
                 if phrase_complete:
                     transcription.append(text)
-                    add_to_todo_stack(text)
+                    write_to_notion(text)
                     print(text)
                 else:
                     transcription[-1] = text

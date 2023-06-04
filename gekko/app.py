@@ -1,24 +1,12 @@
 from datetime import datetime
 from flask import Flask, jsonify, request
-from gekko.api.classifier_services import ClassifierManager
-from gekko.whisper.live_transcribe import main
-from gekko.memory.memory_writer import add_to_todo_stack
-from gekko.api.notion_manager import create_page
+from api.classifier_services import ClassifierManager
+from whisper_wrap.live_transcribe import main
+from memory.memory_writer import add_to_todo_stack
 app = Flask(__name__)
 
 classifier_manager = ClassifierManager()
 classifier_manager.create_classifier()
-
-title = "Test Title"
-description = "Test Description"
-published_date = datetime.now().isoformat()
-data = {
-    "URL": {"title": [{"text": {"content": description}}]},
-    "Title": {"rich_text": [{"text": {"content": title}}]},
-    "Published": {"date": {"start": published_date, "end": None}}
-}
-
-create_page(data)
 
 @app.route('/classifier', methods=['GET'])
 def intake():

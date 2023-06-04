@@ -1,7 +1,7 @@
 from .classifier import Classifier
 from langchain.agents import Tool
-from gekko.memory.memory_writer import write_to_json
-from gekko.api.file_watcher import FileWatcher
+from memory.memory_writer import write_to_json
+from api.file_watcher import FileWatcher
 
 class ClassifierManager: 
     def __init__ (self):
