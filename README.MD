@@ -1,8 +1,8 @@
 Currently in POC stage. 
 
-# Project Name
+# Gekko
 
-This project uses Notion API, the Notion Manager API and Gekko, a Python based application. Below you will find all the necessary steps to get the project up and running on your local machine.
+This project uses Open AI whisper, Langchain, and the Notion API. Below you will find all the necessary steps to get the project up and running on your local machine.
 
 ## Getting Started
 
