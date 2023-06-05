@@ -20,6 +20,7 @@ class Classifier:
                 self.title, self.summary = parse_string(input)
                 if all_fields_ready():
                     write_to_notion(self.title, self.summary, self.text, self.score)
+                    self.score = self.title = self.text = self.summary = ""
                     return("I have successfully completed all my tasks. Go me!")
                 else:
                     return("I have to sumbit the importance score now.")
@@ -38,10 +39,11 @@ class Classifier:
             print(chalk.red("\n" + score))
             try:
                 self.score = int(score)
-            except: 
+            except Exception as e: 
                 return("I accidentally sumbitted the score in an invalid format!!!")
             if all_fields_ready():
                 write_to_notion(self.title, self.summary, self.text, self.score)
+                self.score = self.title = self.text = self.summary = ""
                 return("I have successfully completed all my tasks. Go me!")
             else:
                 return("I have to sumbit the summary and title now.")
