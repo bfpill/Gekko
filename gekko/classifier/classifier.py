@@ -12,7 +12,7 @@ class Classifier:
     
     def __init__(self):
 
-        self.score = self.title = self.text = self.summary = ""
+        self.score = self.title = self.text = self.summary = self.timestamp = ""
 
         def print_title_and_summary(input):
             if input != "Not Important":
@@ -23,7 +23,10 @@ class Classifier:
                     self.score = self.title = self.text = self.summary = ""
                     return("I have successfully completed all my tasks. Go me!")
                 else:
-                    return("I have to sumbit the importance score now.")
+                    if self.score == "":
+                        return("I have to sumbit the importance score now")
+                    elif self.timestamp == "":
+                        return("I have to sumbit the timestamp now")
 
         def parse_string(s):
             parts = s.split(', ')
@@ -32,7 +35,7 @@ class Classifier:
             return (title, summary)
         
         def all_fields_ready():
-            if self.title != "" and self.text != "" and self.summary != "" and self.score != "":
+            if self.title != "" and self.text != "" and self.summary != "" and self.score != "" and self.timestamp !="":
                 return True
         
         def submit_importance_score(score):
@@ -46,7 +49,27 @@ class Classifier:
                 self.score = self.title = self.text = self.summary = ""
                 return("I have successfully completed all my tasks. Go me!")
             else:
-                return("I have to sumbit the summary and title now.")
+                if self.summary == "" or self.title == "":
+                    return("I have to sumbit the summary and title now.")
+                elif self.timestamp == "":
+                    return("I have to sumbit the timestamp now")
+            
+        def submit_time_and_date(tAndD): 
+            print(chalk.red("\n" + tAndD))
+            try:
+                self.timestamp = tAndD + ""
+            except Exception as e: 
+                return("I accidentally sumbitted the score in an invalid format!!!")
+            if all_fields_ready():
+                write_to_notion(self.timestamp, self.title, self.summary, self.text, self.score)
+                self.score = self.title = self.text = self.summary = self.timestamp = ""
+                return("I have successfully completed all my tasks. Go me!")
+            else:
+                if self.summary == "" or self.title == "":
+                    return("I have to sumbit the summary and title now.")
+                elif self.score == "":
+                    return("I have to sumbit the importance score now")
+                
 
         self.tools = [
             Tool.from_function(
@@ -58,6 +81,11 @@ class Classifier:
             func = submit_importance_score,
             name = "Submit_Importance_Score",
             description="""Use this to sumbit the importance of the conversation. Input should be a number between 1 and 10."""
+            ),
+             Tool.from_function(
+            func = submit_time_and_date,
+            name = "Submit_time_and_date",
+            description="""Use this to sumbit the time and date of the conversation."""
             ),
         ]
 

@@ -9,7 +9,7 @@ const notion = new Client({ auth: process.env.NOTION_TOKEN })
 
 const databaseId = process.env.NOTION_DATABASE_ID
 
-async function addItem(title: string, summary: string, text: string, score: number) {
+async function addItem(timestamp: string, title: string, summary: string, text: string, score: number) {
   try {
     const response = await notion.pages.create({
       parent: { database_id: databaseId as string },
@@ -20,6 +20,15 @@ async function addItem(title: string, summary: string, text: string, score: numb
             {
               "text": {
                 "content": summary
+              }
+            }
+          ]
+        },
+        "Time": {
+          "rich_text":[
+            {
+              "text": {
+                "content": timestamp
               }
             }
           ]

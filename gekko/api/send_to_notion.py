@@ -1,8 +1,9 @@
 import requests
 
-def write_to_notion(title, summary, text, score):
+def write_to_notion(timestamp, title, summary, text, score):
     try:
         payload = {
+            "timestamp": timestamp, 
             "title": title, 
             "summary": summary,
             "text": text,
