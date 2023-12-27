@@ -64,10 +64,6 @@ http://127.0.0.1:8000/gekko/start
 
 This will start whisper in real time, add text to the queue, run your conversation past the AI, and then add to notion.
 
-Make sure your Notion database is set up like this:
-
-<img width="1021" alt="Screenshot 2023-06-05 at 10 10 23 AM" src="https://github.com/bfpill/Gekko/assets/85584607/ee0e64fd-650c-4f38-b2d4-ca5984d0326b">
-
 ---
 
 Thank you for using this project. If you encounter any issues or have any questions, feel free to open an issue. Happy coding!
